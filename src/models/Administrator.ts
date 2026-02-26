@@ -5,6 +5,7 @@ class Administrator extends Model {
     public id!: number;
     public email!: string;
     public password!: string;
+    public role!: string;
 }
 
 Administrator.init({
@@ -21,6 +22,11 @@ Administrator.init({
     password: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "admin",
     },
 }, {
     sequelize,
