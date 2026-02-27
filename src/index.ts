@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import dotenv from "dotenv";
 import sequelize from "./config/database";
 import authRoutes from "./routes/authRoutes";
@@ -12,13 +13,16 @@ const PORT = process.env.PORT || 3000;
 // Middleware para parsear JSON
 app.use(express.json());
 
-// Rutas
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, "../frontend")));
+
+// Rutas API
 app.use("/auth", authRoutes);
 app.use("/students", studentRoutes);
 
-// Ruta de prueba
+// Redirigir raíz al login
 app.get("/", (req, res) => {
-    res.json({ message: "API AppNotas funcionando correctamente" });
+    res.redirect("/login.html");
 });
 
 // Conexión a la base de datos y arranque del servidor
