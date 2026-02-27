@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppNotas — Dashboard Admin</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h2><span class="icon">📚</span> AppNotas</h2>
+            <p>Panel de Administración</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active"><span class="nav-icon">👥</span> Estudiantes</a>
+            <a href="#"><span class="nav-icon">👨‍🏫</span> Profesores (Próximamente)</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn-logout">
+                <span>🚪</span> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Gestión de Estudiantes</h1>
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div>
+                    <div class="user-name">Administrador</div>
+                    <div class="user-role">admin</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">👥</div>
+                <div class="stat-info">
+                    <h3 id="totalStudents">0</h3>
+                    <p>Total Estudiantes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas globales -->
+        <div id="alert" class="alert">
+            <span class="icon"></span>
+            <span id="alert-message"></span>
+        </div>
+
+        <!-- Table Section -->
+        <section class="table-section">
+            <div class="table-header">
+                <h2>Lista de Estudiantes</h2>
+                <button id="addStudentBtn" class="btn btn-primary">
+                    <span>➕</span> Nuevo Estudiante
+                </button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>ID Profesor</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- Loading -->
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 40px;">
+                                <div class="spinner" style="border-top-color: var(--primary)"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Form (Crear/Editar) -->
+    <div id="studentModal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modalTitle">Nuevo Estudiante</h2>
+            <form id="studentForm">
+                <input type="hidden" id="studentId">
+
+                <div class="form-group">
+                    <label for="name">Nombre Completo</label>
+                    <input type="text" id="name" required placeholder="Ej: Juan Pérez">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input type="email" id="email" required placeholder="juan@ejemplo.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Opcional al editar">
+                    <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;">
+                        *Requerido al crear nuevo estudiante.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="teacherId">ID del Profesor Asignado</label>
+                    <input type="number" id="teacherId" placeholder="Ej: 1 (Dejar vacío si no aplica)">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="closeModalBtn" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="saveStudentBtn" class="btn btn-primary">
+                        <span id="saveBtnText">Guardar</span>
+                        <span id="saveSpinner" class="spinner" style="display:none; width:16px; height:16px;"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Eliminar -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal" style="max-width: 400px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 16px;">⚠️</div>
+            <h2 style="justify-content:center;">¿Eliminar Estudiante?</h2>
+            <p style="color:var(--text-secondary); margin-bottom:24px;">Esta acción no se puede deshacer. Se eliminarán
+                todos los datos del estudiante.</p>
+            <input type="hidden" id="deleteTargetId">
+            <div class="modal-actions" style="justify-content:center;">
+                <button type="button" id="closeDeleteModalBtn" class="btn btn-secondary">Cancelar</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>
