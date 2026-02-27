@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppNotas — Portal Estudiante</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h2><span class="icon">📚</span> AppNotas</h2>
+            <p>Portal del Estudiante</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active"><span class="nav-icon">👤</span> Mi Perfil</a>
+            <a href="#"><span class="nav-icon">📝</span> Mis Notas (Próximamente)</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn-logout">
+                <span>🚪</span> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Mi Perfil Estudiantil</h1>
+            <div class="user-info">
+                <div class="avatar" id="topAvatar">E</div>
+                <div>
+                    <div class="user-name" id="topName">Cargando...</div>
+                    <div class="user-role">Estudiante</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Alertas -->
+        <div id="alert" class="alert">
+            <span class="icon"></span>
+            <span id="alert-message"></span>
+        </div>
+
+        <div id="loadingState" class="loading-container">
+            <div class="spinner"></div>
+            <p>Cargando información del perfil...</p>
+        </div>
+
+        <!-- Profile Info -->
+        <div id="profileContent" style="display: none; max-width: 800px; margin: 0 auto;">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="mainAvatar">E</div>
+                    <h2 id="profileName">Nombre del Estudiante</h2>
+                    <p id="profileRole">Estudiante Regular</p>
+                </div>
+
+                <div class="profile-body">
+                    <div class="profile-info-item">
+                        <div class="info-icon">🆔</div>
+                        <div>
+                            <div class="info-label">ID de Estudiante</div>
+                            <div class="info-value" id="infoId">-</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <div class="info-icon">✉️</div>
+                        <div>
+                            <div class="info-label">Correo Electrónico Institucional</div>
+                            <div class="info-value" id="infoEmail">-</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <div class="info-icon">📅</div>
+                        <div>
+                            <div class="info-label">Fecha de Registro</div>
+                            <div class="info-value" id="infoDate">-</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-info-item"
+                        style="background: var(--primary-bg); padding: 20px; border-radius: 12px; margin-top: 16px; border: 1px solid rgba(79, 70, 229, 0.2);">
+                        <div class="info-icon" style="background: #fff;">👨‍🏫</div>
+                        <div>
+                            <div class="info-label">Profesor Asignado</div>
+                            <div class="info-value" id="infoTeacher"
+                                style="font-size: 18px; font-weight: 700; color: var(--primary);">Sin asignar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/student.js"></script>
+</body>
+
+</html>
