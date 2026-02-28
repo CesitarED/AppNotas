@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppNotas — Dashboard Profesor</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h2><span class="icon">📚</span> AppNotas</h2>
+            <p>Panel del Profesor</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active"><span class="nav-icon">📘</span> Mis Asignaturas</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn-logout">
+                <span>🚪</span> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Mis Asignaturas</h1>
+            <div class="user-info">
+                <div class="avatar" id="topAvatar">P</div>
+                <div>
+                    <div class="user-name" id="topName">Cargando...</div>
+                    <div class="user-role">Profesor</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">📘</div>
+                <div class="stat-info">
+                    <h3 id="totalSubjects">0</h3>
+                    <p>Asignaturas Asignadas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas globales -->
+        <div id="alert" class="alert">
+            <span class="icon"></span>
+            <span id="alert-message"></span>
+        </div>
+
+        <div id="loadingState" class="loading-container">
+            <div class="spinner"></div>
+            <p>Cargando información del profesor...</p>
+        </div>
+
+        <div id="dashboardContent" style="display: none;">
+            <!-- Grid de asignaturas -->
+            <div id="subjectsGrid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                <!-- Las asignaturas se cargarán aquí -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Gestión de Notas -->
+    <div id="gradesModal" class="modal-overlay">
+        <div class="modal" style="max-width: 800px; width: 90%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2 id="gradesModalTitle" style="margin: 0;">Gestionar Notas</h2>
+                <button id="closeGradesModalBtn" class="btn btn-secondary btn-sm">Cerrar</button>
+            </div>
+
+            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                <!-- Lista de estudiantes (Izquierda) -->
+                <div style="flex: 1; min-width: 300px;">
+                    <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--text-secondary);">Estudiantes
+                        Asignados</h3>
+                    <div id="studentsList" style="max-height: 400px; overflow-y: auto; padding-right: 8px;">
+                        <!-- Estudiantes se listan aquí -->
+                    </div>
+                </div>
+
+                <!-- Detalles de Notas (Derecha) -->
+                <div
+                    style="flex: 1.5; min-width: 350px; background: var(--bg-body); padding: 20px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <div id="selectedStudentInfo" style="display: none;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                            <div>
+                                <h3 id="selectedStudentName" style="font-size: 18px; margin-bottom: 4px;">Nombre del
+                                    Estudiante</h3>
+                                <p id="selectedStudentEmail" style="font-size: 13px; color: var(--text-muted);">
+                                    email@estudiante.com</p>
+                            </div>
+                            <button id="addGradeBtn" class="btn btn-primary btn-sm">➕ Nota de Seguimiento</button>
+                        </div>
+
+                        <div id="studentGradesList">
+                            <!-- Tabla de notas o mensaje vacío -->
+                        </div>
+                    </div>
+
+                    <div id="noStudentSelected"
+                        style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                        <div style="font-size: 40px; margin-bottom: 16px;">👤</div>
+                        <p>Selecciona un estudiante de la lista para ver o añadir sus notas de seguimiento.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario de Nota -->
+    <div id="gradeFormModal" class="modal-overlay" style="z-index: 1050;">
+        <div class="modal" style="max-width: 400px;">
+            <h2 id="gradeFormTitle">Añadir Nota</h2>
+            <form id="gradeForm">
+                <input type="hidden" id="gradeIdField">
+                <input type="hidden" id="gradeSubjectId">
+                <input type="hidden" id="gradeStudentId">
+
+                <div class="form-group">
+                    <label for="gradeValue">Calificación (0 - 5.0)</label>
+                    <input type="number" id="gradeValue" step="0.1" min="0" max="5.0" required placeholder="Ej: 4.5">
+                </div>
+
+                <div class="form-group">
+                    <label for="gradeDescription">Descripción del Seguimiento</label>
+                    <input type="text" id="gradeDescription" required placeholder="Ej: Taller semana 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="gradeDate">Fecha</label>
+                    <input type="date" id="gradeDate" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="closeGradeFormBtn" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" id="saveGradeBtn" class="btn btn-primary">
+                        <span id="saveGradeBtnText">Guardar</span>
+                        <span id="saveGradeSpinner" class="spinner"
+                            style="display:none; width:16px; height:16px;"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Confirmar Eliminar Nota -->
+    <div id="deleteGradeModal" class="modal-overlay" style="z-index: 1050;">
+        <div class="modal" style="max-width: 350px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 16px;">⚠️</div>
+            <h2 style="justify-content:center;">¿Eliminar Nota?</h2>
+            <p style="color:var(--text-secondary); margin-bottom:24px;">Esta acción eliminará la nota de seguimiento y
+                no se puede deshacer.</p>
+            <input type="hidden" id="deleteGradeTargetId">
+            <div class="modal-actions" style="justify-content:center;">
+                <button type="button" id="closeDeleteGradeBtn" class="btn btn-secondary">Cancelar</button>
+                <button type="button" id="confirmDeleteGradeBtn" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/teacher.js"></script>
+</body>
+
+</html>
