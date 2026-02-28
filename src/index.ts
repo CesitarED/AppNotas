@@ -4,6 +4,12 @@ import dotenv from "dotenv";
 import sequelize from "./config/database";
 import authRoutes from "./routes/authRoutes";
 import studentRoutes from "./routes/studentRoutes";
+import teacherRoutes from "./routes/teacherRoutes";
+
+// Importar modelos para que Sequelize los registre y sincronice
+import "./models/Administrator";
+import "./models/Student";
+import "./models/Teaching";
 
 dotenv.config();
 
@@ -19,6 +25,7 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 // Rutas API
 app.use("/auth", authRoutes);
 app.use("/students", studentRoutes);
+app.use("/teachers", teacherRoutes);
 
 // Redirigir raíz al login
 app.get("/", (req, res) => {

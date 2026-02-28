@@ -1,15 +1,18 @@
 import { AdministratorRepository } from "../repositories/AdministratorRepository";
 import { StudentRepository } from "../repositories/StudentRespository";
+import { TeachingRepository } from "../repositories/TeachingRepository";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export class AuthService {
     private adminRepository: AdministratorRepository;
     private studentRepository: StudentRepository;
+    private teachingRepository: TeachingRepository;
 
     constructor() {
         this.adminRepository = new AdministratorRepository();
         this.studentRepository = new StudentRepository();
+        this.teachingRepository = new TeachingRepository();
     }
 
     async login(email: string, password: string) {
@@ -26,6 +29,21 @@ export class AuthService {
                 { expiresIn: "1h" }
             );
             return { token, role: "admin" };
+        }
+
+        // Buscar en profesores
+        const teacher = await this.teachingRepository.findTeacherByEmail(email);
+        if (teacher) {
+            const validPassword = await bcrypt.compare(password, teacher.password);
+            if (!validPassword) {
+                throw new Error("Contraseña incorrecta");
+            }
+            const token = jwt.sign(
+                { id: teacher.id, role: "teacher" },
+                process.env.JWT_SECRET as string,
+                { expiresIn: "1h" }
+            );
+            return { token, role: "teacher" };
         }
 
         // Buscar en estudiantes
