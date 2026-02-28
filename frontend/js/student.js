@@ -10,12 +10,20 @@ if (!token || role !== 'student') {
     window.location.href = '/login.html';
 }
 
+// Global state
+let studentData = null;
+let currentSection = 'profile';
+
 // Elementos DOM
 const logoutBtn = document.getElementById('logoutBtn');
 const loadingState = document.getElementById('loadingState');
-const profileContent = document.getElementById('profileContent');
+const pageTitle = document.getElementById('pageTitle');
 
-// Elementos de datos
+// Secciones
+const profileSection = document.getElementById('profileSection');
+const gradesSection = document.getElementById('gradesSection');
+
+// Elementos de datos Perfil
 const topName = document.getElementById('topName');
 const topAvatar = document.getElementById('topAvatar');
 const mainAvatar = document.getElementById('mainAvatar');
@@ -25,15 +33,28 @@ const infoEmail = document.getElementById('infoEmail');
 const infoDate = document.getElementById('infoDate');
 const infoTeacher = document.getElementById('infoTeacher');
 
+// Elementos de datos Notas
+const totalGradesCount = document.getElementById('totalGradesCount');
+const gradesContainer = document.getElementById('gradesContainer');
+
 const alertEl = document.getElementById('alert');
 const alertMsg = document.getElementById('alert-message');
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchProfile();
+    initApp();
+
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = link.getAttribute('data-section');
+            switchSection(section);
+        });
+    });
+
     logoutBtn.addEventListener('click', logout);
 });
 
-// Función simple para decodificar JWT sin librerías externas
 function parseJwt(token) {
     try {
         const base64Url = token.split('.')[1];
@@ -41,24 +62,22 @@ function parseJwt(token) {
         const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
-
         return JSON.parse(jsonPayload);
     } catch (e) {
         return null;
     }
 }
 
-async function fetchProfile() {
+async function initApp() {
     try {
-        // En el JWT, el id del usuario está codificado. Lo extraemos:
         const payload = parseJwt(token);
-
         if (!payload || !payload.id) {
             throw new Error('Token inválido o expirado. Por favor, inicia sesión de nuevo.');
         }
 
         const studentId = payload.id;
 
+        // Fetch Student Profile
         const response = await fetch(`${API_URL}/students/${studentId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -68,56 +87,168 @@ async function fetchProfile() {
             throw new Error('Error al obtener datos del perfil');
         }
 
-        const student = await response.json();
+        studentData = await response.json();
 
-        renderProfile(student);
+        // Formatear profesor asigando. Hay que leerlo de la bd o listado de profesores admin, pero el estudiante 
+        // solo almacena teacherId en la bd, necesitariamos otro endpoint. Mostraremos el ID.
+        renderProfile(studentData);
+
+        // Fetch Student Grades
+        await fetchStudentGrades(studentId);
+
+        // Termina la carga
+        loadingState.style.display = 'none';
+
+        // Forzar vista de perfil
+        switchSection('profile');
 
     } catch (error) {
         showGlobalAlert(error.message, 'error');
         loadingState.innerHTML = `<p style="color:var(--danger)">${error.message}</p>`;
-
-        // Si el error es de token invalido, sacarlo despues de 3 segundos
         if (error.message.includes('Token')) {
             setTimeout(logout, 3000);
         }
     }
 }
 
+function switchSection(section) {
+    currentSection = section;
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+    document.querySelector(`.sidebar-nav a[data-section="${section}"]`).classList.add('active');
+
+    if (section === 'profile') {
+        profileSection.style.display = 'block';
+        gradesSection.style.display = 'none';
+        pageTitle.textContent = 'Mi Perfil Estudiantil';
+    } else {
+        profileSection.style.display = 'none';
+        gradesSection.style.display = 'block';
+        pageTitle.textContent = 'Mis Notas de Seguimiento';
+    }
+}
+
 function renderProfile(student) {
-    // Inicial para el Avatar
     const initial = student.name ? student.name.charAt(0).toUpperCase() : 'E';
 
-    // Top Bar
     topName.textContent = student.name;
     topAvatar.textContent = initial;
 
-    // Main Card
     mainAvatar.textContent = initial;
     profileName.textContent = student.name;
     infoId.textContent = `#${student.id}`;
     infoEmail.textContent = student.email;
 
-    // Formatear Fecha
     const date = new Date(student.createdAt);
     infoDate.textContent = date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    // Profesor
     if (student.teacherId) {
-        infoTeacher.textContent = `Profesor ID: # ${student.teacherId}`;
+        infoTeacher.textContent = `Profesor ID: #${student.teacherId}`;
         infoTeacher.style.color = "var(--primary)";
     } else {
         infoTeacher.textContent = "Aún no tienes un profesor asignado";
         infoTeacher.style.color = "var(--text-secondary)";
         infoTeacher.style.fontWeight = "500";
     }
+}
 
-    // Cambiar vista de carga a vista de datos
-    loadingState.style.display = 'none';
-    profileContent.style.display = 'block';
+async function fetchStudentGrades(studentId) {
+    try {
+        const response = await fetch(`${API_URL}/teachers/grades/student/${studentId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error("No se pudieron cargar las notas");
+
+        const grades = await response.json();
+        renderGrades(grades);
+
+    } catch (error) {
+        gradesContainer.innerHTML = `<p style="color:var(--danger)">${error.message}</p>`;
+    }
+}
+
+function renderGrades(grades) {
+    totalGradesCount.textContent = grades.length;
+
+    if (grades.length === 0) {
+        gradesContainer.innerHTML = `
+            <div style="background: var(--bg-card); padding: 60px 40px; text-align: center; border-radius: var(--radius-md); border: 1px dashed var(--border);">
+                <span style="font-size: 50px; display: block; margin-bottom: 16px;">📚</span>
+                <h3 style="color: var(--text-secondary); font-size: 20px;">No tienes notas registradas</h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Aún no se te han asignado notas de seguimiento.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Agrupar notas por asignatura para mostrarlas ordenadas
+    const subjectsMap = {};
+    grades.forEach(grade => {
+        const subjectId = grade.subject.id;
+        if (!subjectsMap[subjectId]) {
+            subjectsMap[subjectId] = {
+                name: grade.subject.name,
+                teacher: grade.subject.teacher ? grade.subject.teacher.name : `ID #${grade.subject.teacherId}`,
+                grades: []
+            };
+        }
+        subjectsMap[subjectId].grades.push(grade);
+    });
+
+    const html = Object.keys(subjectsMap).map(subjectId => {
+        const subject = subjectsMap[subjectId];
+
+        // Calcular promedio de la asignatura
+        const sum = subject.grades.reduce((acc, curr) => acc + curr.grade, 0);
+        const avg = subject.grades.length > 0 ? (sum / subject.grades.length).toFixed(1) : "0.0";
+
+        const gradesHtml = subject.grades.map(g => `
+            <tr>
+                <td style="padding: 12px 16px; font-size: 13px; color: var(--text-muted);">${g.date}</td>
+                <td style="padding: 12px 16px; font-size: 14px;">${g.description}</td>
+                <td style="padding: 12px 16px; text-align: right; font-weight: 700; font-size: 15px; color: ${g.grade >= 3.0 ? 'var(--success)' : 'var(--danger)'};">${g.grade.toFixed(1)}</td>
+            </tr>
+        `).join('');
+
+        return `
+            <div style="background: var(--bg-card); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border);">
+                <div style="background: var(--primary-bg); padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <h2 style="font-size: 18px; color: var(--primary-dark); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                            <span>📘</span> ${subject.name}
+                        </h2>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            👨‍🏫 Docente: ${subject.teacher}
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: right; background: white; padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 2px;">Promedio</div>
+                        <div style="font-size: 20px; font-weight: 800; color: ${avg >= 3.0 ? 'var(--success)' : 'var(--danger)'};">${avg}</div>
+                    </div>
+                </div>
+                
+                <div style="padding: 0; overflow-x: auto;">
+                    <table class="data-table" style="width: 100%; border: none;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 12px 16px; background: white; border-bottom: 2px solid var(--border);">Fecha</th>
+                                <th style="padding: 12px 16px; background: white; border-bottom: 2px solid var(--border);">Descripción del Seguimiento</th>
+                                <th style="padding: 12px 16px; background: white; border-bottom: 2px solid var(--border); text-align: right;">Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${gradesHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    gradesContainer.innerHTML = html;
 }
 
 function showGlobalAlert(message, type = 'error') {
