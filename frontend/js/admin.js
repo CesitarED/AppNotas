@@ -44,6 +44,13 @@ const closeDeleteStudentModalBtn = document.getElementById('closeDeleteStudentMo
 const confirmDeleteStudentBtn = document.getElementById('confirmDeleteStudentBtn');
 const deleteStudentTargetId = document.getElementById('deleteStudentTargetId');
 
+// --- Estudiantes Asignaturas DOM ---
+const studentSubjectsModal = document.getElementById('studentSubjectsModal');
+const studentSubjectsModalTitle = document.getElementById('studentSubjectsModalTitle');
+const studentSubjectsList = document.getElementById('studentSubjectsList');
+const addStudentSubjectForm = document.getElementById('addStudentSubjectForm');
+const closeStudentSubjectsModalBtn = document.getElementById('closeStudentSubjectsModalBtn');
+
 // --- Profesores DOM ---
 const teachersTableBody = document.getElementById('teachersTableBody');
 const teacherModal = document.getElementById('teacherModal');
@@ -89,6 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
     studentForm.addEventListener('submit', handleStudentSave);
     closeDeleteStudentModalBtn.addEventListener('click', closeDeleteStudentModal);
     confirmDeleteStudentBtn.addEventListener('click', handleDeleteStudentConfirm);
+
+    // Modal Materias Estudiante
+    closeStudentSubjectsModalBtn.addEventListener('click', closeStudentSubjectsModal);
+    addStudentSubjectForm.addEventListener('submit', handleAddStudentSubject);
 
     // Modal Profesor
     addTeacherBtn.addEventListener('click', () => openTeacherModal());
@@ -146,7 +157,6 @@ async function handleStudentSave(e) {
     const name = document.getElementById('studentName').value;
     const email = document.getElementById('studentEmail').value;
     const password = document.getElementById('studentPassword').value;
-    const teacherId = document.getElementById('studentTeacherId').value;
 
     const isEdit = !!id;
 
@@ -157,7 +167,6 @@ async function handleStudentSave(e) {
 
     const payload = { name, email };
     if (password) payload.password = password;
-    if (teacherId) payload.teacherId = parseInt(teacherId);
 
     saveStudentBtnText.style.display = 'none';
     saveStudentSpinner.style.display = 'inline-block';
@@ -373,7 +382,10 @@ function renderStudentsTable() {
             <td>${student.name}</td>
             <td>${student.email}</td>
             <td><span class="badge badge-primary">${student.role}</span></td>
-            <td>${student.teacherId ? student.teacherId : '<span style="color:var(--text-muted)">-</span>'}</td>
+            <td>
+                ${student.subjects && student.subjects.length > 0 ? student.subjects.length + ' materias' : '<span style="color:var(--text-muted)">Sin materias</span>'}
+                <button class="btn btn-sm btn-secondary" onclick="openStudentSubjectsModal(${student.id})" title="Gestionar Materias" style="margin-left:8px;">📘</button>
+            </td>
             <td class="actions">
                 <button class="btn btn-sm btn-secondary" onclick="openStudentModal(${student.id})" title="Editar">✏️</button>
                 <button class="btn btn-sm btn-danger" onclick="openDeleteStudentModal(${student.id})" title="Eliminar">🗑️</button>
@@ -427,7 +439,6 @@ function openStudentModal(id = null) {
             document.getElementById('studentId').value = student.id;
             document.getElementById('studentName').value = student.name;
             document.getElementById('studentEmail').value = student.email;
-            if (student.teacherId) document.getElementById('studentTeacherId').value = student.teacherId;
         }
     } else {
         studentModalTitle.textContent = "Nuevo Estudiante";
@@ -450,6 +461,63 @@ function openDeleteStudentModal(id) {
 function closeDeleteStudentModal() {
     deleteStudentModal.classList.remove('show');
     deleteStudentTargetId.value = '';
+}
+
+// ===== MODAL ASIGNATURAS ESTUDIANTE =====
+
+function openStudentSubjectsModal(studentId) {
+    const student = students.find(s => s.id === parseInt(studentId));
+    studentSubjectsModalTitle.textContent = `📘 Materias de ${student ? student.name : 'Estudiante'}`;
+    document.getElementById('subjectStudentId').value = studentId;
+
+    if (!student.subjects || student.subjects.length === 0) {
+        studentSubjectsList.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding: 20px;">No hay materias asignadas</p>`;
+    } else {
+        studentSubjectsList.innerHTML = student.subjects.map(subject => `
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:var(--primary-bg); border-radius:var(--radius-sm); margin-bottom:8px; border: 1px solid var(--border);">
+                <div>
+                    <strong>${subject.name}</strong>
+                    <span style="color:var(--text-muted); font-size:12px; margin-left:8px;">(Profesor: ${subject.teacher ? subject.teacher.name : 'N/A'})</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    studentSubjectsModal.classList.add('show');
+}
+
+function closeStudentSubjectsModal() {
+    studentSubjectsModal.classList.remove('show');
+}
+
+async function handleAddStudentSubject(e) {
+    e.preventDefault();
+    const studentId = document.getElementById('subjectStudentId').value;
+    const subjectId = document.getElementById('newStudentSubjectId').value;
+
+    try {
+        const response = await fetch(`${API_URL}/students/${studentId}/subjects`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ subjectId: parseInt(subjectId) })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || 'Error al asignar materia');
+        }
+
+        showGlobalAlert('Materia asignada con éxito', 'success');
+        document.getElementById('newStudentSubjectId').value = '';
+
+        await fetchStudents();
+        setTimeout(() => openStudentSubjectsModal(studentId), 100);
+    } catch (error) {
+        showGlobalAlert(error.message, 'error');
+    }
 }
 
 // ===== MODALES PROFESORES =====

@@ -48,11 +48,11 @@ export const deleteStudent = async (req: Request, res: Response) => {
     }
 };
 
-export const assignTeacher = async (req: Request, res: Response) => {
+export const assignSubject = async (req: Request, res: Response) => {
     try {
-        const { teacherId } = req.body;
-        const student = await studentService.assignTeacher(Number(req.params.id), teacherId);
-        res.json({ message: "Profesor asignado correctamente", student });
+        const { subjectId } = req.body;
+        const student = await studentService.assignSubject(Number(req.params.id), Number(subjectId));
+        res.json({ message: "Materia asignada correctamente", student });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }

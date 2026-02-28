@@ -1,5 +1,6 @@
 import { StudentRepository } from "../repositories/StudentRespository";
 import bcrypt from "bcryptjs";
+import { Subject } from "../models/Teaching";
 
 export class StudentService {
     private studentRepository: StudentRepository;
@@ -40,7 +41,17 @@ export class StudentService {
         return await this.studentRepository.deleteStudent(id);
     }
 
-    async assignTeacher(studentId: number, teacherId: number) {
-        return await this.studentRepository.updateStudent(studentId, { teacherId });
+    async assignSubject(studentId: number, subjectId: number) {
+        if (subjectId <= 0) {
+            throw new Error("El ID de la materia debe ser mayor a 0");
+        }
+        const student: any = await this.studentRepository.findById(studentId);
+        if (!student) throw new Error("Estudiante no encontrado");
+
+        const subject = await Subject.findByPk(subjectId);
+        if (!subject) throw new Error("La materia indicada no existe");
+
+        await student.addSubject(subject);
+        return student;
     }
 }

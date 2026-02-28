@@ -143,8 +143,8 @@ function renderProfile(student) {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    if (student.teacherId) {
-        infoTeacher.textContent = `Profesor ID: #${student.teacherId}`;
+    if (student.teacher) {
+        infoTeacher.textContent = `Profesor: ${student.teacher.name}`;
         infoTeacher.style.color = "var(--primary)";
     } else {
         infoTeacher.textContent = "Aún no tienes un profesor asignado";
