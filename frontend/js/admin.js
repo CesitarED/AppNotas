@@ -84,9 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sidebar navigation
     document.querySelectorAll('.sidebar-nav a').forEach(link => {
         link.addEventListener('click', (e) => {
-            e.preventDefault();
             const section = link.getAttribute('data-section');
-            switchSection(section);
+            if (section) {
+                e.preventDefault();
+                switchSection(section);
+            }
         });
     });
 

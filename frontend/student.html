@@ -87,10 +87,14 @@
                     <div class="profile-info-item"
                         style="background: var(--primary-bg); padding: 20px; border-radius: 12px; margin-top: 16px; border: 1px solid rgba(79, 70, 229, 0.2);">
                         <div class="info-icon" style="background: #fff;">👨‍🏫</div>
-                        <div>
-                            <div class="info-label" style="margin-bottom: 4px;">Profesor Asignado</div>
-                            <div class="info-value" id="infoTeacher"
-                                style="font-size: 18px; font-weight: 700; color: var(--primary);">Sin asignar</div>
+                        <div style="flex: 1;">
+                            <div class="info-label" style="margin-bottom: 8px;">Mis Profesores y Materias</div>
+                            <div id="infoTeacherContainer">
+                                <select id="teacherSubjectSelect" class="form-group"
+                                    style="width: 100%; border-radius: 8px; border: 1px solid var(--border); padding: 10px; background: white; color: var(--text-primary); font-size: 14px; outline: none; box-shadow: var(--shadow-sm); cursor: pointer;">
+                                    <option value="">Cargando asignaturas...</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
