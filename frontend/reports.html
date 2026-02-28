@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppNotas — Reportes Académicos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .report-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .report-section h3 {
+            font-size: 18px;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-students-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .top-student-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--primary-bg);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+        }
+
+        .medal {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding-top: 20px;
+            border-bottom: 2px solid var(--border);
+            position: relative;
+        }
+
+        .bar {
+            width: 80px;
+            background: var(--primary);
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding-top: 8px;
+            transition: height 0.5s ease;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -30px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            width: 100px;
+            transform: translateX(-10px);
+        }
+    </style>
+</head>
+
+<body class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h2><span class="icon">📚</span> AppNotas</h2>
+            <p>Reportes</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin.html"><span class="nav-icon">⬅</span> Volver al Admin</a>
+            <a href="#" class="active"><span class="nav-icon">📊</span> Panel de Reportes</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn-logout">
+                <span>🚪</span> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Panel de Estadísticas</h1>
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div>
+                    <div class="user-name">Administrador</div>
+                    <div class="user-role">admin</div>
+                </div>
+            </div>
+        </header>
+
+        <div id="loading" style="text-align: center; padding: 60px;">
+            <div class="spinner"></div>
+            <p>Calculando estadísticas...</p>
+        </div>
+
+        <div id="reportsContent" style="display: none;">
+            <!-- KPIS Globales -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">👨‍🎓</div>
+                    <div class="stat-info">
+                        <h3 id="statTotalStudents">0</h3>
+                        <p>Total Estudiantes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">👨‍🏫</div>
+                    <div class="stat-info">
+                        <h3 id="statTotalTeachers">0</h3>
+                        <p>Total Profesores</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">📘</div>
+                    <div class="stat-info">
+                        <h3 id="statTotalSubjects">0</h3>
+                        <p>Asignaturas Activas</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: rgb(139, 92, 246);">📈
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="statGlobalAverage">0.0</h3>
+                        <p>Promedio Institucional</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                <!-- Left Column -->
+                <div>
+                    <div class="report-section">
+                        <h3><span>📊</span> Desempeño por Asignatura (Promedios)</h3>
+                        <div class="filter-controls">
+                            <select id="subjectSelect" class="form-group input"
+                                style="max-width: 300px; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                                <option value="all">Todas las asignaturas</option>
+                            </select>
+                            <button id="refreshBtn" class="btn btn-secondary">Actualizar Gráfico</button>
+                        </div>
+
+                        <div style="padding-bottom: 40px;">
+                            <div class="chart-container" id="barChart">
+                                <!-- Barras dibujadas dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <div class="report-section">
+                        <h3><span>🏆</span> Top 5 Estudiantes</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Mejores promedios
+                            acumulados en todas las áreas.</p>
+
+                        <div class="top-students-list" id="topStudentsList">
+                            <!-- Lista renderizada por JS -->
+                        </div>
+                    </div>
+
+                    <div class="report-section"
+                        style="background: var(--primary-bg); border-color: rgba(2, 132, 199, 0.2);">
+                        <h3 style="color: var(--primary);"><span>💡</span> Análisis Rápido</h3>
+                        <ul id="insightsList"
+                            style="padding-left: 20px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            <li>Calculando insights...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/reports.js"></script>
+</body>
+
+</html>

@@ -5,6 +5,7 @@ import sequelize from "./config/database";
 import authRoutes from "./routes/authRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import teacherRoutes from "./routes/teacherRoutes";
+import publicRoutes from "./routes/publicRoutes";
 
 // Importar modelos para que Sequelize los registre y sincronice
 import "./models/Administrator";
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 app.use("/auth", authRoutes);
 app.use("/students", studentRoutes);
 app.use("/teachers", teacherRoutes);
+app.use("/public", publicRoutes);
 
 // Redirigir raíz al login
 app.get("/", (req, res) => {
