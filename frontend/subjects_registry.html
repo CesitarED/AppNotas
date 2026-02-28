@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppNotas — Registro de Materias</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h2><span class="icon">📚</span> AppNotas</h2>
+            <p>Registro de Materias</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin.html"><span class="nav-icon">⬅</span> Volver al Admin</a>
+            <a href="#" class="active"><span class="nav-icon">📂</span> Registro de Materias</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="btn-logout">
+                <span>🚪</span> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Libro de Materias Existentes</h1>
+            <div class="user-info">
+                <div class="avatar">A</div>
+                <div>
+                    <div class="user-name" id="userName">Administrador</div>
+                    <div class="user-role" id="userRole">admin</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 600px;">
+            <div class="stat-card">
+                <div class="stat-icon orange">📘</div>
+                <div class="stat-info">
+                    <h3 id="totalSubjectsCount">0</h3>
+                    <p>Materias Registradas</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">👨‍🎓</div>
+                <div class="stat-info">
+                    <h3 id="totalEnrolledCount">0</h3>
+                    <p>Total de Matrículas</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="alert" class="alert">
+            <span class="icon"></span>
+            <span id="alert-message"></span>
+        </div>
+
+        <section class="table-section">
+            <div class="table-header">
+                <h2>Materias y Cantidad de Estudiantes</h2>
+                <div style="font-size: 14px; color: var(--text-muted);">
+                    Listado oficial de asignaturas
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID Materia</th>
+                            <th>Nombre de la Materia</th>
+                            <th>Profesor a Cargo</th>
+                            <th>Estudiantes Registrados</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectsTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding: 40px;">
+                                <div class="spinner" style="border-top-color: var(--primary)"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/subjects_registry.js"></script>
+</body>
+
+</html>

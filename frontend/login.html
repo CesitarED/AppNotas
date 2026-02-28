@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AppNotas - Sistema de gestión de notas académicas. Inicia sesión para acceder.">
+    <title>AppNotas — Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo">
+                <div class="logo-icon">📚</div>
+                <h1>AppNotas</h1>
+                <p>Sistema de Gestión Académica</p>
+            </div>
+
+            <!-- Alert -->
+            <div id="alert" class="alert alert-error">
+                <span>⚠️</span>
+                <span id="alert-message"></span>
+            </div>
+
+            <!-- Formulario -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <div class="input-icon-wrapper">
+                        <span class="icon">✉️</span>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="correo@ejemplo.com" 
+                            required 
+                            autocomplete="email"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-icon-wrapper">
+                        <span class="icon">🔒</span>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Ingresa tu contraseña" 
+                            required 
+                            autocomplete="current-password"
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" id="loginBtn" class="btn btn-primary btn-full">
+                    <span id="loginBtnText">Iniciar Sesión</span>
+                    <span id="loginSpinner" class="spinner" style="display:none;"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>
