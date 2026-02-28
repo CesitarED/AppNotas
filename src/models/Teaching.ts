@@ -131,4 +131,7 @@ Grade.belongsTo(Subject, { foreignKey: 'subjectId', as: 'subject' });
 Student.hasMany(Grade, { foreignKey: 'studentId', as: 'grades' });
 Grade.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
 
+Student.belongsToMany(Subject, { through: 'StudentSubjects', as: 'subjects', foreignKey: 'studentId' });
+Subject.belongsToMany(Student, { through: 'StudentSubjects', as: 'students', foreignKey: 'subjectId' });
+
 export { Teacher, Subject, Grade };

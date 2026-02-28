@@ -31,7 +31,7 @@ const profileName = document.getElementById('profileName');
 const infoId = document.getElementById('infoId');
 const infoEmail = document.getElementById('infoEmail');
 const infoDate = document.getElementById('infoDate');
-const infoTeacher = document.getElementById('infoTeacher');
+const teacherSelect = document.getElementById('teacherSubjectSelect');
 
 // Elementos de datos Notas
 const totalGradesCount = document.getElementById('totalGradesCount');
@@ -143,13 +143,14 @@ function renderProfile(student) {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    if (student.teacherId) {
-        infoTeacher.textContent = `Profesor ID: #${student.teacherId}`;
-        infoTeacher.style.color = "var(--primary)";
+    if (student.subjects && student.subjects.length > 0) {
+        teacherSelect.innerHTML = student.subjects.map(sub => {
+            const teacherName = sub.teacher ? sub.teacher.name : 'N/A';
+            return `<option value="${sub.id}">Profesor: ${teacherName} | Materia: ${sub.name} (Código: ${sub.id})</option>`;
+        }).join('');
     } else {
-        infoTeacher.textContent = "Aún no tienes un profesor asignado";
-        infoTeacher.style.color = "var(--text-secondary)";
-        infoTeacher.style.fontWeight = "500";
+        teacherSelect.innerHTML = '<option value="">Aún no tienes asignaturas asignadas</option>';
+        teacherSelect.disabled = true;
     }
 }
 

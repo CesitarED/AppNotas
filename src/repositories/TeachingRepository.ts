@@ -37,12 +37,12 @@ export class TeachingRepository {
         return { message: "Profesor eliminado correctamente" };
     }
 
-    // ===== SUBJECTS =====
     async findSubjectsByTeacher(teacherId: number) {
         return await Subject.findAll({
             where: { teacherId },
             include: [
-                { model: Grade, as: 'grades', include: [{ model: Student, as: 'student', attributes: ['id', 'name', 'email'] }] }
+                { model: Grade, as: 'grades', include: [{ model: Student, as: 'student', attributes: ['id', 'name', 'email'] }] },
+                { model: Student, as: 'students', attributes: ['id', 'name', 'email'] }
             ]
         });
     }

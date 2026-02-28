@@ -201,38 +201,16 @@ async function openGradesModal(subjectId, subjectName) {
 // Cargar la lista de estudiantes para este profesor
 async function loadStudentsList() {
     try {
-        const response = await fetch(`${API_URL}/students`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const currentSubject = subjects.find(s => s.id === currentSubjectId);
 
-        let students = [];
-        // Si no tenemos permiso admin la ruta /students fallará. 
-        // Nota: en backend studentRoutes.ts GET /students es admin-only.
-        // Haremos un fix temporal si falla trayendo los estudiantes a los que les hemos puesto notas.
-        if (response.ok) {
-            const allStudents = await response.json();
-            // Filtrar estudiantes que tienen como profesor el nuestro
-            students = allStudents.filter(s => s.teacherId === teacherId);
+        if (currentSubject && currentSubject.students) {
+            teacherStudents = currentSubject.students;
         } else {
-            // Si el backend restringe, esto es un workaround usando los datos obtenidos de los grados de la asignatura
-            const currentSubject = subjects.find(s => s.id === currentSubjectId);
-            const uniqueStudentIds = new Set();
-            if (currentSubject && currentSubject.grades) {
-                currentSubject.grades.forEach(g => {
-                    if (g.student) {
-                        if (!uniqueStudentIds.has(g.student.id)) {
-                            uniqueStudentIds.add(g.student.id);
-                            students.push(g.student);
-                        }
-                    }
-                });
-            }
+            teacherStudents = [];
         }
 
-        teacherStudents = students;
-
-        if (students.length === 0) {
-            studentsList.innerHTML = `<p style="padding: 16px; background: var(--bg-body); border-radius: var(--radius-sm); font-size: 14px; text-align: center; color: var(--text-muted);">No tienes estudiantes asignados.</p>`;
+        if (teacherStudents.length === 0) {
+            studentsList.innerHTML = `<p style="padding: 16px; background: var(--bg-body); border-radius: var(--radius-sm); font-size: 14px; text-align: center; color: var(--text-muted);">No tienes estudiantes asignados a esta asignatura.</p>`;
             return;
         }
 

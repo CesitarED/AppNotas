@@ -18,6 +18,7 @@
         <nav class="sidebar-nav">
             <a href="#" class="active" data-section="students"><span class="nav-icon">👥</span> Estudiantes</a>
             <a href="#" data-section="teachers"><span class="nav-icon">👨‍🏫</span> Profesores</a>
+            <a href="/subjects_registry.html"><span class="nav-icon">📂</span> Registro de Materias</a>
             <a href="/reports.html"
                 style="margin-top: 15px; background: rgba(139, 92, 246, 0.1); color: rgb(139, 92, 246);"><span
                     class="nav-icon">📊</span> Ver Reportes </a>
@@ -83,7 +84,7 @@
                             <th>Nombre</th>
                             <th>Email</th>
                             <th>Rol</th>
-                            <th>ID Profesor</th>
+                            <th>Materias Asignadas</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -155,10 +156,6 @@
                     </small>
                 </div>
 
-                <div class="form-group">
-                    <label for="studentTeacherId">ID del Profesor Asignado</label>
-                    <input type="number" id="studentTeacherId" placeholder="Ej: 1 (Dejar vacío si no aplica)">
-                </div>
 
                 <div class="modal-actions">
                     <button type="button" id="closeStudentModalBtn" class="btn btn-secondary">Cancelar</button>
@@ -257,6 +254,28 @@
 
             <div class="modal-actions" style="margin-top: 20px;">
                 <button type="button" id="closeSubjectsModalBtn" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Asignaturas del Estudiante -->
+    <div id="studentSubjectsModal" class="modal-overlay">
+        <div class="modal" style="max-width: 560px;">
+            <h2 id="studentSubjectsModalTitle">📘 Materias del Estudiante</h2>
+
+            <div id="studentSubjectsList" style="margin-bottom: 20px;"></div>
+
+            <form id="addStudentSubjectForm" style="display: flex; gap: 8px; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="newStudentSubjectId">ID de la Materia</label>
+                    <input type="number" id="newStudentSubjectId" required min="1" placeholder="Ej: 1">
+                </div>
+                <input type="hidden" id="subjectStudentId">
+                <button type="submit" class="btn btn-primary" style="height: 46px;">Asignar</button>
+            </form>
+
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button type="button" id="closeStudentSubjectsModalBtn" class="btn btn-secondary">Cerrar</button>
             </div>
         </div>
     </div>

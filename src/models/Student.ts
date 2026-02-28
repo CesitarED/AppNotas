@@ -7,7 +7,6 @@ class Student extends Model {
     public email!: string;
     public password!: string;
     public role!: string;
-    public teacherId!: number | null;
 }
 
 Student.init({
@@ -33,11 +32,6 @@ Student.init({
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "student",
-    },
-    teacherId: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        defaultValue: null,
     },
 }, {
     sequelize,
