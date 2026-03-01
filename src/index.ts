@@ -18,16 +18,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware CORS estricto
-// Aquí se definen los dominios autorizados (whitelist).
-// Por defecto incluimos localhost, y en un despliegue como Azure, añadirías el dominio de producción.
-const whitelist = ['http://localhost:3000', process.env.FRONTEND_URL || ''];
+// Whitelist de orígenes permitidos
+const whitelist = [
+    'http://localhost:3000',
+    'http://localhost:5173',         // Vite en desarrollo
+    process.env.FRONTEND_URL || ''   // URL del frontend en Render
+].filter(Boolean);                 // Elimina strings vacíos
 
 const corsOptions = {
     origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-        // En desarrollo o clientes que no envían origin (herramientas como curl/postman)
-        // se puede permitir dejando pasar !origin si se desea, o bloquearlo.
-        // Aquí bloqueamos si no está en la whitelist y tiene origin.
         if (!origin || whitelist.includes(origin)) {
             callback(null, true);
         } else {
