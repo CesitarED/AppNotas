@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import cors from "cors";
+import bcrypt from "bcryptjs";
 import sequelize from "./config/database";
 import authRoutes from "./routes/authRoutes";
 import studentRoutes from "./routes/studentRoutes";
@@ -12,6 +13,7 @@ import publicRoutes from "./routes/publicRoutes";
 import "./models/Administrator";
 import "./models/Student";
 import "./models/Teaching";
+import Administrator from "./models/Administrator";
 
 dotenv.config();
 
@@ -21,9 +23,9 @@ const PORT = process.env.PORT || 3000;
 // Whitelist de orígenes permitidos
 const whitelist = [
     'http://localhost:3000',
-    'http://localhost:5173',         // Vite en desarrollo
-    process.env.FRONTEND_URL || ''   // URL del frontend en Render
-].filter(Boolean);                 // Elimina strings vacíos
+    'http://localhost:5173',
+    process.env.FRONTEND_URL || ''
+].filter(Boolean);
 
 const corsOptions = {
     origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
@@ -64,6 +66,21 @@ const startServer = async () => {
 
         await sequelize.sync({ alter: true });
         console.log("✅ Modelos sincronizados con la base de datos.");
+
+        // Crear admin por defecto si no existe
+        const [, created] = await Administrator.findOrCreate({
+            where: { email: "admin@appnotas.com" },
+            defaults: {
+                email: "admin@appnotas.com",
+                password: await bcrypt.hash("admin123", 10),
+                role: "admin"
+            }
+        });
+        if (created) {
+            console.log("✅ Admin creado: admin@appnotas.com / admin123");
+        } else {
+            console.log("ℹ️ Admin ya existe.");
+        }
 
         app.listen(PORT, () => {
             console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
